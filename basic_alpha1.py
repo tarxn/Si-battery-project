@@ -185,9 +185,9 @@ class FCN(nn.Module):
 """## **Parameter array**"""
 
 # Nu: Number of training points # Nf: Number of collocation points (Evaluate PDE)
-Nu_arr = [100, 200]
-Nf_arr = [1000, 2000]
-Nr_arr = [100, 200]
+Nu_arr = [1000, 2000]
+Nf_arr = [10000, 20000]
+Nr_arr = [1000, 2000]
 # w=[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
 w = 0.1
 count = 0
@@ -313,7 +313,7 @@ for Nr in Nr_arr:
                     # plot3D_Matrix(arr_x1, arr_T1, arr_y1)
                     plt.plot(arr_x1, arr_y1, label="predicted function,with lambda=" + str(w))
 
-                    # plt.legend()
+                    plt.legend()
                     plt.show()
 
                 w = w + 0.1
