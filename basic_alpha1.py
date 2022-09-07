@@ -311,12 +311,12 @@ for Nr in Nr_arr:
                     # t = torch.linspace(t_min, t_max, total_points_t).view(-1, 1)
 
                     # plot3D_Matrix(arr_x1, arr_T1, arr_y1)
-                    plt.plot(arr_x1, arr_y1, label="predicted function,with lambda=")
+                    plt.plot(arr_x1, arr_y1, label="predicted function,with lambda=" + str(w))
 
-                    plt.legend()
+                    # plt.legend()
                     plt.show()
 
-                    w = w + 0.1
+                w = w + 0.1
 
     #     Nu= Nu+100
     #   Nf=Nf+1000
