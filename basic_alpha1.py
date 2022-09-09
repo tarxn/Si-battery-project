@@ -328,6 +328,7 @@ for Nr in Nr_arr:
                     plt.ylabel("concentration")
                     plt.plot(arr_x1, arr_y1)
                     plt.legend()
+                    plt.savefig('lamba0.1.png')
                     plt.show()
 
                 w = w + 0.1
