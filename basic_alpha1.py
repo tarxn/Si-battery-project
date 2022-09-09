@@ -269,17 +269,19 @@ for Nr in Nr_arr:
                 print("Nu : " + str(Nu))
                 print("Nf : " + str(Nf))
                 print("lambda:" + str(w))
+
+                # print(y1_arr)
                 for j in range(3):
                     a_rel = 0
                     a_train = 0
                     a_test = 0
                     v = 10
-                    print('epoch no.:', j + 1)
+                    print('iteration no.:', j + 1)
                     for i in range(steps):
                         if i == 0:
-                            print("Training Loss-----Test Loss-----Relative Loss")
+                            print("Training Loss-----Test Loss")
                         loss = PINN.loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # use mean squared error
-                        rel_er = PINN.rel_loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # .
+                        # rel_er = PINN.rel_loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # .
                         optimizer.zero_grad()
                         loss.backward()
                         # rel_er.backward()
@@ -288,20 +290,29 @@ for Nr in Nr_arr:
                             with torch.no_grad():
                                 test_loss = PINN.lossBC(X_test, Y_test, layers)
 
-                            re = rel_er.detach().cpu().numpy()  # rel. error
+                            # re = rel_er.detach().cpu().numpy()  # rel. error
                             tre = loss.detach().cpu().numpy()  # training error
                             te = test_loss.detach().cpu().numpy()  # test error
 
-                            a_rel = a_rel + re
+                            # a_rel = a_rel + re
                             a_train = a_train + tre
                             a_test = a_test + te
 
-                            print(tre, '---', te, '---', re)
+                            print(tre, '---', te)
                     print("Average losses:")
-                    print(round(a_train / v, 15), '---', round(a_test / v, 9), '---', round(a_rel / v, 9))
-                    y1 = PINN(X_test)
-                    x1 = X_test[:, 0]
-                    t1 = torch.ones(X_test[:, 1].size())
+                    print(round(a_train / v, 15), '---', round(a_test / v, 9))
+                    y1_all = PINN(X_test)
+                    x1_all = X_test[:, 0]
+                    # t1 = torch.ones(X_test[:, 1].size())
+                    t1_all=X_test[:, 1]
+
+                    x1=x1_all
+                    y1=y1_all
+                    t1=t1_all
+                    print(x1_all)
+                    print(t1_all)
+                    print(y1_all)
+
                     arr_x1 = x1.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
                     arr_T1 = t1.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
                     arr_y1 = y1.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
@@ -311,8 +322,11 @@ for Nr in Nr_arr:
                     # t = torch.linspace(t_min, t_max, total_points_t).view(-1, 1)
 
                     # plot3D_Matrix(arr_x1, arr_T1, arr_y1)
-                    plt.plot(arr_x1, arr_y1, label="predicted function,with lambda=" + str(w))
 
+                    plt.title("predicted c(r,t) function for lambda=" + str(w))
+                    plt.xlabel("x(normalised r)")
+                    plt.ylabel("concentration")
+                    plt.plot(arr_x1, arr_y1)
                     plt.legend()
                     plt.show()
 
