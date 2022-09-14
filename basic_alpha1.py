@@ -272,7 +272,6 @@ for Nr in Nr_arr:
                 print("Nf : " + str(Nf))
                 print("lambda:" + str(w))
 
-                # print(y1_arr)
                 for j in range(3):
                     a_rel = 0
                     a_train = 0
@@ -280,30 +279,30 @@ for Nr in Nr_arr:
                     v = 10
                     print('iteration no.:', j + 1)
                     ## start
-                    # for i in range(steps):
-                    #     if i == 0:
-                    #         print("Training Loss-----Test Loss")
-                    #     loss = PINN.loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # use mean squared error
-                    #     # rel_er = PINN.rel_loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # .
-                    #     optimizer.zero_grad()
-                    #     loss.backward()
-                    #     # rel_er.backward()
-                    #     optimizer.step()
-                    #     if i % (steps / v) == 0:
-                    #         with torch.no_grad():
-                    #             test_loss = PINN.lossBC(X_test, Y_test, layers)
-                    #
-                    #         # re = rel_er.detach().cpu().numpy()  # rel. error
-                    #         tre = loss.detach().cpu().numpy()  # training error
-                    #         te = test_loss.detach().cpu().numpy()  # test error
-                    #
-                    #         # a_rel = a_rel + re
-                    #         a_train = a_train + tre
-                    #         a_test = a_test + te
-                    #
-                    #         print(tre, '---', te)
-                    # print("Average losses:")
-                    # print(round(a_train / v, 15), '---', round(a_test / v, 9))
+                    for i in range(steps):
+                        if i == 0:
+                            print("Training Loss-----Test Loss")
+                        loss = PINN.loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # use mean squared error
+                        # rel_er = PINN.rel_loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # .
+                        optimizer.zero_grad()
+                        loss.backward()
+                        # rel_er.backward()
+                        optimizer.step()
+                        if i % (steps / v) == 0:
+                            with torch.no_grad():
+                                test_loss = PINN.lossBC(X_test, Y_test, layers)
+
+                            # re = rel_er.detach().cpu().numpy()  # rel. error
+                            tre = loss.detach().cpu().numpy()  # training error
+                            te = test_loss.detach().cpu().numpy()  # test error
+
+                            # a_rel = a_rel + re
+                            a_train = a_train + tre
+                            a_test = a_test + te
+
+                            print(tre, '---', te)
+                    print("Average losses:")
+                    print(round(a_train / v, 15), '---', round(a_test / v, 9))
                     ## end
                     y1_all = PINN(X_test)
                     x1_all = X_test[:, 0]
@@ -324,7 +323,7 @@ for Nr in Nr_arr:
                     plt.title("predicted c(r,t) function for lambda=" + str(w))
                     plt.xlabel("x(normalised r)")
                     plt.ylabel("concentration")
-                    plt.plot(arr_x1,arr_y1,label="on training set")
+                    plt.plot(arr_x1,arr_y1,label="predicted function")
                     # plt.plot(arr_x1, arr_y_test,label="on test set")
 
                     plt.legend()
