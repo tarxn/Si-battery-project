@@ -29,6 +29,8 @@ from pyDOE import lhs  # Latin Hypercube Sampling
 from scipy import stats
 import math
 
+import rfunctions as rf
+
 # Set default dtype to float32
 torch.set_default_dtype(torch.float)
 
@@ -189,7 +191,7 @@ Nu_arr = [1000, 2000]
 Nf_arr = [10000, 20000]
 Nr_arr = [1000, 2000]
 # w=[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
-w = 0.1
+w = 1
 count = 0
 for Nr in Nr_arr:
     for Nf in Nf_arr:
@@ -277,56 +279,54 @@ for Nr in Nr_arr:
                     a_test = 0
                     v = 10
                     print('iteration no.:', j + 1)
-                    for i in range(steps):
-                        if i == 0:
-                            print("Training Loss-----Test Loss")
-                        loss = PINN.loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # use mean squared error
-                        # rel_er = PINN.rel_loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # .
-                        optimizer.zero_grad()
-                        loss.backward()
-                        # rel_er.backward()
-                        optimizer.step()
-                        if i % (steps / v) == 0:
-                            with torch.no_grad():
-                                test_loss = PINN.lossBC(X_test, Y_test, layers)
-
-                            # re = rel_er.detach().cpu().numpy()  # rel. error
-                            tre = loss.detach().cpu().numpy()  # training error
-                            te = test_loss.detach().cpu().numpy()  # test error
-
-                            # a_rel = a_rel + re
-                            a_train = a_train + tre
-                            a_test = a_test + te
-
-                            print(tre, '---', te)
-                    print("Average losses:")
-                    print(round(a_train / v, 15), '---', round(a_test / v, 9))
+                    ## start
+                    # for i in range(steps):
+                    #     if i == 0:
+                    #         print("Training Loss-----Test Loss")
+                    #     loss = PINN.loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # use mean squared error
+                    #     # rel_er = PINN.rel_loss(X_train_Nu, Y_train_Nu, X_train_Nf, f_hat, layers)  # .
+                    #     optimizer.zero_grad()
+                    #     loss.backward()
+                    #     # rel_er.backward()
+                    #     optimizer.step()
+                    #     if i % (steps / v) == 0:
+                    #         with torch.no_grad():
+                    #             test_loss = PINN.lossBC(X_test, Y_test, layers)
+                    #
+                    #         # re = rel_er.detach().cpu().numpy()  # rel. error
+                    #         tre = loss.detach().cpu().numpy()  # training error
+                    #         te = test_loss.detach().cpu().numpy()  # test error
+                    #
+                    #         # a_rel = a_rel + re
+                    #         a_train = a_train + tre
+                    #         a_test = a_test + te
+                    #
+                    #         print(tre, '---', te)
+                    # print("Average losses:")
+                    # print(round(a_train / v, 15), '---', round(a_test / v, 9))
+                    ## end
                     y1_all = PINN(X_test)
                     x1_all = X_test[:, 0]
                     # t1 = torch.ones(X_test[:, 1].size())
                     t1_all=X_test[:, 1]
 
-                    x1=x1_all
-                    y1=y1_all
-                    t1=t1_all
-                    print(x1_all)
-                    print(t1_all)
-                    print(y1_all)
-
-                    arr_x1 = x1.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
-                    arr_T1 = t1.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
-                    arr_y1 = y1.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
-                    arr_y_test = y_test.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
-                    # plot3D_Matrix(arr_x1,arr_T1,arr_y1,j+1)
-                    # x = torch.linspace(x_min, x_max, total_points_x).view(-1, 1)
-                    # t = torch.linspace(t_min, t_max, total_points_t).view(-1, 1)
-
-                    # plot3D_Matrix(arr_x1, arr_T1, arr_y1)
-
+                    a,b= rf.get_idx(t1_all,50)
+                    x1=x1_all[a:b+1]
+                    y1=y1_all[a:b+1]
+                    t1=t1_all[a:b+1]
+                    # arr_x1 = x1.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
+                    # arr_T1 = t1.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
+                    # arr_y1 = y1.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
+                    # arr_y_test = y_test.reshape(shape=[total_points_x, total_points_t]).transpose(1, 0).detach().cpu()
+                    arr_x1= x1.detach().numpy()
+                    arr_y1= y1.detach().numpy()
+                    arr_y_test = y_test[a:b+1].detach().numpy()
                     plt.title("predicted c(r,t) function for lambda=" + str(w))
                     plt.xlabel("x(normalised r)")
                     plt.ylabel("concentration")
-                    plt.plot(arr_x1, arr_y1)
+                    plt.plot(arr_x1,arr_y1,label="on training set")
+                    # plt.plot(arr_x1, arr_y_test,label="on test set")
+
                     plt.legend()
                     plt.savefig('lamba0.1.png')
                     plt.show()
