@@ -19,6 +19,8 @@ import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.ticker
+import scipy.integrate as spi
+import sympy as sp
 # from sklearn.model_selection import train_test_split
 # from google.colab import files
 
@@ -103,8 +105,30 @@ def conc(x, t):
     sf2 = sum(arr2)
     return ((2*c1*r0*a*sf1)/r) - ((2*c2*r2*a*sf2)/r)
 
-def strain_rad(x,t):
-    
+def strain_rad(r,t):
+    r_, t_ = sp.symbols('r_ t_')
+    crt1 = conc(r_,t_)
+    crt2= conc(r_,t)
+    crt3 = conc(r,t_)
+    r11=r_**2 * sp.integrate(crt1,(t_,0,t))
+    term1=-2*(1+v)/(3*(1-v)) * (omega/r ** 3) * sp.integrate(r**2 * crt2,(r_,r0,r))
+    term2=-(2*(1+v)* xi * omega / (3*(1-v) * r**3)) * sp.integrate(r11, (r_,r0,r))
+    term3  = A / 3 - (2 * B / r*r) + ((1+v) * omega * conc(r,t) / (3*(1-v)))
+    term4= (1+v) * xi * omega / (3*(1-v)) * sp.integrate(crt3,(t_,0,t))
+    return term1+term2+term3+term4
+
+def strain_rad(r,t):
+    r_, t_ = sp.symbols('r_ t_')
+    crt1 = conc(r_, t_)
+    crt2 = conc(r_, t)
+    crt3 = conc(r, t_)
+    r11 = r_ ** 2 * sp.integrate(crt1, (t_, 0, t))
+    term1 = -2 * (1 + v) / (3 * (1 - v)) * (omega / r ** 3) * sp.integrate(r ** 2 * crt2, (r_, r0, r))
+    term2 = -(2 * (1 + v) * xi * omega / (3 * (1 - v) * r ** 3)) * sp.integrate(r11, (r_, r0, r))
+    term3 = A / 3 - (2 * B / r * r) + ((1 + v) * omega * conc(r, t) / (3 * (1 - v)))
+    term4 = (1 + v) * xi * omega / (3 * (1 - v)) * sp.integrate(crt3, (t_, 0, t))
+    return term1 + term2 + term3 + term4
+
 def plot3D_Matrix(x, t, y):
     X, T = x, t
     F_xt = y
